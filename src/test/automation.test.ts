@@ -95,10 +95,8 @@ suite('ABI Extractor', () => {
     });
     
     test('detects ERC20 contracts', () => {
+        // Only core required functions per EIP-20 (name, symbol, decimals are optional)
         const erc20Abi: ABIItem[] = [
-            { type: 'function', name: 'name' },
-            { type: 'function', name: 'symbol' },
-            { type: 'function', name: 'decimals' },
             { type: 'function', name: 'totalSupply' },
             { type: 'function', name: 'balanceOf' },
             { type: 'function', name: 'transfer' },

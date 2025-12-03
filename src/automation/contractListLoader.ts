@@ -6,6 +6,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { ContractEntry, CHAIN_ID_MAP } from './types';
+import { isValidAddress } from '../utils';
 
 /**
  * Load contracts from a JSON file
@@ -54,7 +55,7 @@ function normalizeContractEntry(entry: ContractEntry): ContractEntry {
  */
 function isValidContractEntry(entry: ContractEntry): boolean {
     // Must have a valid Ethereum-style address
-    if (!entry.address || !/^0x[a-f0-9]{40}$/i.test(entry.address)) {
+    if (!entry.address || !isValidAddress(entry.address)) {
         return false;
     }
     

@@ -3,6 +3,7 @@ import { ParsedSource } from './sourceParser';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
+import { validateAddressWithMessage } from './utils';
 
 export interface UserInput {
     chainId: string;
@@ -34,15 +35,7 @@ export async function showInputDialog(): Promise<UserInput | undefined> {
     const address = await vscode.window.showInputBox({
         prompt: 'Enter Contract Address',
         placeHolder: '0x...',
-        validateInput: (value) => {
-            if (!value) {
-                return 'Address cannot be empty';
-            }
-            if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
-                return 'Please enter a valid Ethereum address (0x followed by 40 hex characters)';
-            }
-            return null;
-        }
+        validateInput: validateAddressWithMessage
     });
 
     if (!address) {

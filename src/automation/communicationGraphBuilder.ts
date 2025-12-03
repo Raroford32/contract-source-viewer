@@ -201,7 +201,7 @@ export class CommunicationGraphBuilder {
         }
         
         // Multisig detection
-        if (functionNames.has('submitTransaction') || functionNames.has('confirmtransaction') || name.includes('multisig')) {
+        if (functionNames.has('submittransaction') || functionNames.has('confirmtransaction') || name.includes('multisig')) {
             return 'multisig';
         }
         
@@ -253,12 +253,12 @@ export class CommunicationGraphBuilder {
         const contractAddress = contract.address.toLowerCase();
         const abi = contract.abi || [];
         
-        // Find referenced addresses
+        // Find referenced addresses using matchAll for better performance
         const addressPattern = /0x[a-fA-F0-9]{40}/g;
-        let match;
         const referencedAddresses = new Set<string>();
+        const matches = sourceCode.matchAll(addressPattern);
         
-        while ((match = addressPattern.exec(sourceCode)) !== null) {
+        for (const match of matches) {
             const address = match[0].toLowerCase();
             if (address !== contractAddress && this.nodes.has(address)) {
                 referencedAddresses.add(address);

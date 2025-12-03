@@ -81,9 +81,12 @@ export function extractReadOnlyFunctions(abi: ABIItem[]): ABIItem[] {
 
 /**
  * Check if contract is ERC20
+ * Note: According to EIP-20, name, symbol, and decimals are OPTIONAL
+ * Only the core functions are required
  */
 export function isERC20(abi: ABIItem[]): boolean {
-    const requiredFunctions = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'approve', 'allowance', 'transferFrom'];
+    // Core required functions per EIP-20
+    const requiredFunctions = ['totalSupply', 'balanceOf', 'transfer', 'approve', 'allowance', 'transferFrom'];
     const functionNames = new Set(abi.filter(item => item.type === 'function').map(item => item.name));
     return requiredFunctions.every(fn => functionNames.has(fn));
 }

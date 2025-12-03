@@ -254,21 +254,14 @@ export class BatchContractFetcher {
         // Save status
         fs.writeFileSync(statusPath, JSON.stringify(this.status, null, 2));
         
-        // Save fetched contracts (streaming to avoid memory issues)
-        const writeStream = fs.createWriteStream(contractsPath);
-        writeStream.write('[\n');
-        
-        for (let i = 0; i < results.length; i++) {
-            const contract = results[i];
-            const json = JSON.stringify(contract, null, 2);
-            writeStream.write(json);
-            if (i < results.length - 1) {
-                writeStream.write(',\n');
-            }
+        // Save fetched contracts synchronously for reliability
+        // For very large datasets, consider using streaming with proper error handling
+        try {
+            const jsonContent = JSON.stringify(results, null, 2);
+            fs.writeFileSync(contractsPath, jsonContent);
+        } catch (error) {
+            console.error(`Failed to save contracts: ${error instanceof Error ? error.message : String(error)}`);
         }
-        
-        writeStream.write('\n]');
-        writeStream.end();
     }
     
     /**
