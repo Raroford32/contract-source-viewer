@@ -17,6 +17,8 @@ A simple VSCode extension that allows you to fetch and view smart contract sourc
 - ⚡ **Fast & Reliable**: Quick fetching with proper error handling
 - ✅ **Input Validation**: Validates chain IDs and contract addresses
 - 🔄 **Real-time Progress**: Progress indicators for all operations
+- 🤖 **Batch Automation**: Fetch thousands of contracts automatically
+- 📊 **Graph Building**: Build code and communication relationship graphs
 
 ## 🚀 Quick Start
 
@@ -40,6 +42,139 @@ A simple VSCode extension that allows you to fetch and view smart contract sourc
 | **Avalanche** | 43114 | `0xB31f66AA3C1e785363F...` |
 | **Fantom** | 250 | `0x21be370D5312f44cB42...` |
 
+## 🤖 Batch Automation
+
+This project includes a powerful automation system for fetching large numbers of contracts and building relationship graphs.
+
+### Quick Start
+
+```bash
+# Fetch all contracts from Ethereum and BNB chains
+npm run automation:fetch
+
+# Or run with custom options
+npm run automation -- -i all_ethereum_contracts.json -o ./output --limit 100
+```
+
+### CLI Options
+
+```
+Usage: npm run automation -- [options]
+
+Options:
+  -i, --input <file>       Input JSON file(s) with contract list
+  -o, --output <dir>       Output directory (default: ./contract_data)
+  -b, --blockchain <name>  Filter by blockchain (e.g., ethereum, bnb)
+  -p, --protocol <name>    Filter by protocol
+  --batch-size <n>         Number of contracts per batch (default: 10)
+  --delay <ms>             Delay between requests in ms (default: 200)
+  --batch-delay <ms>       Delay between batches in ms (default: 2000)
+  --retries <n>            Max retries per contract (default: 3)
+  --resume <n>             Resume from contract index
+  --limit <n>              Limit number of contracts to process
+  --skip-fetch             Skip fetching, use existing data
+  --no-graphs              Skip graph generation
+  --save-sources           Save individual source files
+  -q, --quiet              Reduce output verbosity
+  -h, --help               Show help message
+```
+
+### Examples
+
+```bash
+# Fetch only AAVE protocol contracts
+npm run automation -- -i all_ethereum_contracts.json -p aave
+
+# Resume from index 1000 after interruption
+npm run automation -- -i all_ethereum_contracts.json --resume 1000
+
+# Build graphs from existing fetched data
+npm run automation -- --skip-fetch -o ./existing_data
+
+# Fetch first 500 Ethereum contracts with source files
+npm run automation -- -i all_ethereum_contracts.json --limit 500 --save-sources
+```
+
+### Input File Format
+
+The automation expects JSON files with contract entries in this format:
+
+```json
+[
+  {
+    "address": "0x1234567890123456789012345678901234567890",
+    "blockchain": "ethereum",
+    "contract_name": "MyToken",
+    "protocol": "my_protocol"
+  }
+]
+```
+
+### Output Files
+
+The automation generates several output files:
+
+- `contracts.json` - All fetched contract data with source code and ABIs
+- `code_graph.json` - Code relationship graph (inheritance, imports, calls)
+- `code_graph.graphml` - GraphML format for visualization tools
+- `code_graph_d3.json` - D3.js compatible format
+- `communication_graph.json` - Contract communication patterns
+- `communication_graph_d3.json` - D3.js format for communication graph
+- `summary_report.json` - Statistics and summary
+
+### Graph Types
+
+#### Code Graph
+Shows structural relationships between contracts:
+- **inherits** - Contract A inherits from Contract B
+- **imports** - Contract A imports Contract B
+- **calls** - Contract A calls functions on Contract B
+- **uses_interface** - Contract A uses interface from Contract B
+- **same_protocol** - Contracts in the same protocol
+
+#### Communication Graph
+Shows runtime interaction patterns:
+- **token_transfer** - ERC20/721/1155 token transfers
+- **swap** - DEX swap operations
+- **liquidity** - Add/remove liquidity
+- **lending** - Lending/borrowing operations
+- **oracle** - Price feed queries
+- **governance** - Governance voting
+- And more...
+
+### Programmatic Usage
+
+```typescript
+import { 
+  loadContractsFromFile,
+  BatchContractFetcher,
+  CodeGraphBuilder,
+  CommunicationGraphBuilder,
+  DataPersistence 
+} from './src/automation';
+
+// Load contracts
+const contracts = loadContractsFromFile('all_ethereum_contracts.json');
+
+// Fetch source code and ABIs
+const fetcher = new BatchContractFetcher({ batchSize: 10 });
+const fetchedContracts = await fetcher.fetchAll(contracts);
+
+// Build code graph
+const codeBuilder = new CodeGraphBuilder();
+codeBuilder.addContracts(fetchedContracts);
+const codeGraph = codeBuilder.build();
+
+// Build communication graph
+const commBuilder = new CommunicationGraphBuilder();
+commBuilder.addContracts(fetchedContracts);
+const commGraph = commBuilder.build();
+
+// Save results
+const persistence = new DataPersistence('./output');
+persistence.saveCodeGraph(codeGraph);
+persistence.saveCommunicationGraph(commGraph);
+```
 
 ### Development Setup
 ```bash
